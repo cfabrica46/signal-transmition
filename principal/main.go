@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -9,6 +10,8 @@ import (
 )
 
 func main() {
+
+	var bb [][]byte
 
 	sigs := make(chan os.Signal)
 	signal.Notify(sigs, syscall.SIGABRT, syscall.SIGALRM, syscall.SIGINT)
@@ -28,4 +31,47 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Esperando Signals")
+
+loop:
+	for {
+		var b []byte
+
+		for i := 0; i < 7; i++ {
+
+			sig := <-sigs
+
+			switch sig {
+			case syscall.SIGABRT:
+
+				b = append(b, []byte("0")...)
+
+			case syscall.SIGALRM:
+
+				b = append(b, []byte("1")...)
+
+			case syscall.SIGINT:
+
+				break loop
+			}
+
+		}
+
+		bb = append(bb, b)
+	}
+
+	for _, v := range bb {
+
+		letter, err := strconv.ParseInt(string(v), 2, 64)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("%s", []byte{byte(letter)})
+
+	}
+
+	fmt.Println()
 }
