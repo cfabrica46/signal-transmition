@@ -11,7 +11,8 @@ import (
 
 func main() {
 
-	var bb [][]byte
+	var b []byte
+	var exit bool
 
 	sigs := make(chan os.Signal)
 	signal.Notify(sigs, syscall.SIGABRT, syscall.SIGALRM, syscall.SIGINT)
@@ -34,9 +35,7 @@ func main() {
 
 	fmt.Println("Esperando Signals")
 
-loop:
-	for {
-		var b []byte
+	for !exit {
 
 		for i := 0; i < 7; i++ {
 
@@ -45,25 +44,31 @@ loop:
 			switch sig {
 			case syscall.SIGABRT:
 
-				b = append(b, []byte("0")...)
+				b = append(b, '0')
 
 			case syscall.SIGALRM:
 
-				b = append(b, []byte("1")...)
+				b = append(b, '1')
 
-			case syscall.SIGINT:
+			default:
+			}
 
-				break loop
+			if sig == syscall.SIGINT {
+				exit = true
+				break
 			}
 
 		}
 
-		bb = append(bb, b)
 	}
 
-	for _, v := range bb {
+	nLetters := len(b) / 7
 
-		letter, err := strconv.ParseInt(string(v), 2, 64)
+	for i := 0; i < nLetters; i++ {
+
+		letterBinary := fmt.Sprintf("%s", b[i*7:7*(i+1)])
+
+		letter, err := strconv.ParseInt(letterBinary, 2, 64)
 
 		if err != nil {
 			log.Fatal(err)

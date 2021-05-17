@@ -18,15 +18,29 @@ func main() {
 
 	//1001000 1101111 1101100 1100001
 
+	var b []byte
+	var message []syscall.Signal
+
 	b0 := syscall.SIGABRT
 	b1 := syscall.SIGALRM
 
-	h := []syscall.Signal{b1, b0, b0, b1, b0, b0, b0}
-	o := []syscall.Signal{b1, b1, b0, b1, b1, b1, b1}
-	l := []syscall.Signal{b1, b1, b0, b1, b1, b0, b0}
-	a := []syscall.Signal{b1, b1, b0, b0, b0, b0, b1}
+	originalWord := "Hola"
 
-	message := [][]syscall.Signal{h, o, l, a}
+	for i := range []byte(originalWord) {
+		letterBinary := fmt.Sprintf("%b", originalWord[i])
+		b = append(b, []byte(letterBinary)...)
+	}
+
+	for i := range b {
+
+		switch string(b[i]) {
+		case "0":
+			message = append(message, b0)
+		case "1":
+			message = append(message, b1)
+		}
+
+	}
 
 	pidString, err := ioutil.ReadFile("../pid.txt")
 
@@ -48,17 +62,13 @@ func main() {
 
 	for i := range message {
 
-		for indx := range message[i] {
+		err := process.Signal(message[i])
 
-			err := process.Signal(message[i][indx])
-
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			time.Sleep(100 * time.Microsecond)
-
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		time.Sleep(500 * time.Microsecond)
 
 	}
 
