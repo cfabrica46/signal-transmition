@@ -27,9 +27,9 @@ func main() {
 
 	for i := range wordBinary {
 		switch wordBinary[i] {
-		case 0:
+		case false:
 			message = append(message, s0)
-		case 1:
+		case true:
 			message = append(message, s1)
 		}
 	}
@@ -70,13 +70,19 @@ func main() {
 
 }
 
-func convertToBinary(originalWord string) (b []int) {
+func convertToBinary(originalWord string) (b []bool) {
 
 	for _, v := range originalWord {
 
 		for i := 0; i < 8; i++ {
 			move := uint(7 - i)
-			b = append(b, int((v>>move)&1))
+
+			switch int((v >> move) & 1) {
+			case 0:
+				b = append(b, false)
+			case 1:
+				b = append(b, true)
+			}
 		}
 
 	}

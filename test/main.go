@@ -15,14 +15,20 @@ func main() {
 	//fmt.Printf("%08b\n", 64)
 	//fmt.Printf("%08b\n", 128)
 
-	var b []int
+	var b []bool
 	s := "Holi"
 
 	for _, v := range s {
 
 		for i := 0; i < 8; i++ {
 			move := uint(7 - i)
-			b = append(b, int((v>>move)&1))
+
+			switch int((v >> move) & 1) {
+			case 0:
+				b = append(b, false)
+			case 1:
+				b = append(b, true)
+			}
 		}
 
 	}
@@ -35,9 +41,18 @@ func main() {
 
 	for i := range b {
 
+		var x int
+
+		switch b[i] {
+		case false:
+			x = 0
+		case true:
+			x = 1
+		}
+
 		move := i % 8
 
-		a := b[i] << (7 - move)
+		a := x << (7 - move)
 
 		container += a
 

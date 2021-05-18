@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	var messageBinary []int
+	var messageBinary []bool
 	var exit bool
 
 	sigs := make(chan os.Signal)
@@ -42,11 +42,11 @@ func main() {
 			switch sig {
 			case syscall.SIGABRT:
 
-				messageBinary = append(messageBinary, 0)
+				messageBinary = append(messageBinary, false)
 
 			case syscall.SIGALRM:
 
-				messageBinary = append(messageBinary, 1)
+				messageBinary = append(messageBinary, true)
 
 			default:
 			}
@@ -66,14 +66,23 @@ func main() {
 
 }
 
-func convertToString(messageBinary []int) (message []byte) {
+func convertToString(messageBinary []bool) (message []byte) {
 	var container int
 
 	for i := range messageBinary {
 
+		var binaryValue int
+
+		switch messageBinary[i] {
+		case false:
+			binaryValue = 0
+		case true:
+			binaryValue = 1
+		}
+
 		move := i % 8
 
-		a := messageBinary[i] << (7 - move)
+		a := binaryValue << (7 - move)
 
 		container += a
 
