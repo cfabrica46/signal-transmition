@@ -16,30 +16,22 @@ func main() {
 	// syscall.SIGALRM = 1
 	// syscall.SIGINT = EOF
 
-	//1001000 1101111 1101100 1100001
-
-	var b []byte
 	var message []syscall.Signal
 
-	b0 := syscall.SIGABRT
-	b1 := syscall.SIGALRM
+	s0 := syscall.SIGABRT
+	s1 := syscall.SIGALRM
 
-	originalWord := "Hola"
+	originalWord := "Hola que tal? Uwu"
 
-	for i := range []byte(originalWord) {
-		letterBinary := fmt.Sprintf("%b", originalWord[i])
-		b = append(b, []byte(letterBinary)...)
-	}
+	wordBinary := convertToBinary(originalWord)
 
-	for i := range b {
-
-		switch string(b[i]) {
-		case "0":
-			message = append(message, b0)
-		case "1":
-			message = append(message, b1)
+	for i := range wordBinary {
+		switch wordBinary[i] {
+		case 0:
+			message = append(message, s0)
+		case 1:
+			message = append(message, s1)
 		}
-
 	}
 
 	pidString, err := ioutil.ReadFile("../pid.txt")
@@ -76,4 +68,17 @@ func main() {
 
 	fmt.Println("Mensaje enviado correctamente")
 
+}
+
+func convertToBinary(originalWord string) (b []int) {
+
+	for _, v := range originalWord {
+
+		for i := 0; i < 8; i++ {
+			move := uint(7 - i)
+			b = append(b, int((v>>move)&1))
+		}
+
+	}
+	return
 }

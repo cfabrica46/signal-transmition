@@ -10,8 +10,7 @@ import (
 )
 
 func main() {
-
-	var b []byte
+	var messageBinary []int
 	var exit bool
 
 	sigs := make(chan os.Signal)
@@ -37,18 +36,17 @@ func main() {
 
 	for !exit {
 
-		for i := 0; i < 7; i++ {
-
+		for i := 0; i < 8; i++ {
 			sig := <-sigs
 
 			switch sig {
 			case syscall.SIGABRT:
 
-				b = append(b, '0')
+				messageBinary = append(messageBinary, 0)
 
 			case syscall.SIGALRM:
 
-				b = append(b, '1')
+				messageBinary = append(messageBinary, 1)
 
 			default:
 			}
@@ -62,21 +60,28 @@ func main() {
 
 	}
 
-	nLetters := len(b) / 7
+	message := convertToString(messageBinary)
 
-	for i := 0; i < nLetters; i++ {
+	fmt.Printf("Mensaje Recivido: %s\n", message)
 
-		letterBinary := fmt.Sprintf("%s", b[i*7:7*(i+1)])
+}
 
-		letter, err := strconv.ParseInt(letterBinary, 2, 64)
+func convertToString(messageBinary []int) (message []byte) {
+	var container int
 
-		if err != nil {
-			log.Fatal(err)
+	for i := range messageBinary {
+
+		move := i % 8
+
+		a := messageBinary[i] << (7 - move)
+
+		container += a
+
+		if move == 7 {
+			message = append(message, byte(container))
+			container = 0
 		}
 
-		fmt.Printf("%s", []byte{byte(letter)})
-
 	}
-
-	fmt.Println()
+	return
 }
